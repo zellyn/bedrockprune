@@ -45,3 +45,66 @@ func (r Rectangle) ImRect() image.Rectangle {
 func (r Rectangle) InclusiveInt() image.Rectangle {
 	return image.Rect(int(math32.Floor(r.Min.X)), int(math32.Floor(r.Min.Y)), int(math32.Ceil(r.Max.X)), int(math32.Ceil(r.Max.Y)))
 }
+
+// Rect creates an f32.Rectangle from an image.Rectangle.
+func RectFromImRect(imRect image.Rectangle) Rectangle {
+	return Rectangle{
+		Min: Point{X: float32(imRect.Min.X), Y: float32(imRect.Min.Y)},
+		Max: Point{X: float32(imRect.Max.X), Y: float32(imRect.Max.Y)},
+	}
+}
+
+// Size returns r's width and height.
+func (r Rectangle) Size() Point {
+	return Point{
+		X: r.Max.X - r.Min.X,
+		Y: r.Max.Y - r.Min.Y,
+	}
+}
+
+func PointFloor(p Point) image.Point {
+	return image.Point{X: int(math32.Floor(p.X)), Y: int(math32.Floor(p.Y))}
+}
+
+func PointCeil(p Point) image.Point {
+	return image.Point{X: int(math32.Ceil(p.X)), Y: int(math32.Ceil(p.Y))}
+}
+
+func PointTowardsZero(p Point) image.Point {
+	var x, y int
+	if p.X < 0 {
+		x = int(math32.Ceil(p.X))
+	} else {
+		x = int(math32.Floor(p.X))
+	}
+	if p.Y < 0 {
+		y = int(math32.Ceil(p.Y))
+	} else {
+		y = int(math32.Floor(p.Y))
+	}
+
+	return image.Point{X: x, Y: y}
+}
+
+func PointAwayFromZero(p Point) image.Point {
+	var x, y int
+	if p.X < 0 {
+		x = int(math32.Floor(p.X))
+	} else {
+		x = int(math32.Ceil(p.X))
+	}
+	if p.Y < 0 {
+		y = int(math32.Floor(p.Y))
+	} else {
+		y = int(math32.Ceil(p.Y))
+	}
+
+	return image.Point{X: x, Y: y}
+}
+
+func FromImagePt(pt image.Point) Point {
+	return Point{
+		X: float32(pt.X),
+		Y: float32(pt.Y),
+	}
+}
