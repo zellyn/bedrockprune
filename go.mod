@@ -3,7 +3,7 @@ module github.com/zellyn/bedrockprune
 go 1.22.0
 
 require (
-	gioui.org v0.5.0
+	gioui.org v0.5.1-0.20240306214942-1be34eec6fd4
 	github.com/chewxy/math32 v1.10.1
 	github.com/df-mc/dragonfly v0.9.12
 	github.com/df-mc/goleveldb v1.1.9

@@ -355,6 +355,10 @@ func runShowZeroZero() error {
 				if err != nil {
 					return err
 				}
+				fmt.Printf("%d: %v\n", y, block)
+				if true {
+					continue
+				}
 				// h := hm[z][x]
 				// if h == parse.NoHeight {
 				// 	fmt.Printf(" none")
@@ -454,8 +458,8 @@ func runLoadImage() error {
 }
 
 func main() {
-	//if err := runShowZeroZero(); err != nil {
-	if err := runLoadImage(); err != nil {
+	if err := runShowZeroZero(); err != nil {
+		// if err := runLoadImage(); err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		os.Exit(1)
 	}
