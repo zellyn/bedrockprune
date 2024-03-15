@@ -9,30 +9,45 @@ import (
 
 // TileSource16 is the interface for a source of unit area images, where images are 16x16 pixels.
 type TileSource16 interface {
-	Get(x, y int) (*image.NRGBA, error)
+	Get(x, y int) (*image.RGBA, error)
 	AllEmpty(image.Rectangle) (bool, error)
 }
 
 // TileServer is a source/cache of tile images generated from an
 // underlying TileSource16.
 type TileServer struct {
-	source   TileSource16
-	cache    map[int]map[image.Point]cacheEntry
-	empty    map[int]*image.NRGBA
-	maxUnits int
+	source     TileSource16
+	cache      map[int]map[image.Point]cacheEntry
+	empty      map[int]*image.RGBA
+	maxUnits   int
+	empty16x16 *image.RGBA
 }
 
-// NewServer creates a new TileServer, with the given TileSource16
-func NewServer(source TileSource16) *TileServer {
-	return &TileServer{
-		source: source,
-		cache:  make(map[int]map[image.Point]cacheEntry),
-		empty:  make(map[int]*image.NRGBA),
+type option func(ts *TileServer)
+
+func OptionEmpty16x16(img *image.RGBA) option {
+	return func(ts *TileServer) {
+		ts.empty16x16 = img
 	}
 }
 
+// NewServer creates a new TileServer, with the given TileSource16
+func NewServer(source TileSource16, opts ...option) *TileServer {
+	ts := &TileServer{
+		source: source,
+		cache:  make(map[int]map[image.Point]cacheEntry),
+		empty:  make(map[int]*image.RGBA),
+	}
+
+	for _, opt := range opts {
+		opt(ts)
+	}
+
+	return ts
+}
+
 type cacheEntry struct {
-	Image *image.NRGBA
+	Image *image.RGBA
 	Empty bool
 }
 
@@ -40,7 +55,7 @@ type cacheEntry struct {
 // the image itself, and whether the entire area was empty.
 type Tile struct {
 	Area  image.Rectangle // The area this tile covers
-	Image *image.NRGBA    // The image. If units was > 16, this will be scaled down
+	Image *image.RGBA     // The image. If units was > 16, this will be scaled down
 	Empty bool            // True if the whole area was "empty" according to the TileSource16
 }
 
@@ -100,7 +115,7 @@ func (ts *TileServer) Get(area image.Rectangle, units int) ([]Tile, error) {
 	return res, nil
 }
 
-func (ts *TileServer) get(pos image.Point, units int) (*image.NRGBA, bool, error) {
+func (ts *TileServer) get(pos image.Point, units int) (*image.RGBA, bool, error) {
 	if entry, ok := ts.cache[units][pos]; ok {
 		return entry.Image, entry.Empty, nil
 	}
@@ -118,11 +133,20 @@ func (ts *TileServer) get(pos image.Point, units int) (*image.NRGBA, bool, error
 		if err != nil {
 			return nil, false, err
 		}
-		if empty && ts.empty[units] != nil {
-			return ts.empty[units], true, nil
+		if empty {
+			if ts.empty[units] == nil && ts.empty16x16 != nil {
+				ts.empty[units] = ts.empty16x16
+			}
+			if ts.empty[units] != nil {
+				cache[pos] = cacheEntry{
+					Image: ts.empty[units],
+					Empty: true,
+				}
+				return ts.empty[units], true, nil
+			}
 		}
 
-		im := image.NewNRGBA(image.Rect(0, 0, 256, 256))
+		im := image.NewRGBA(image.Rect(0, 0, 256, 256))
 		area := image.Rectangle{}
 		for y := 0; y < 16; y++ {
 			area.Min.Y = y * 16
@@ -159,16 +183,21 @@ func (ts *TileServer) get(pos image.Point, units int) (*image.NRGBA, bool, error
 		if err != nil {
 			return nil, false, err
 		}
-		if allEmpty && ts.empty[units] != nil {
-			cache[pos] = cacheEntry{
-				Image: ts.empty[units],
-				Empty: true,
+		if allEmpty {
+			if ts.empty[units] == nil && ts.empty16x16 != nil {
+				ts.empty[units] = ts.empty16x16
 			}
-			return ts.empty[units], true, nil
+			if ts.empty[units] != nil {
+				cache[pos] = cacheEntry{
+					Image: ts.empty[units],
+					Empty: true,
+				}
+				return ts.empty[units], true, nil
+			}
 		}
 	}
 
-	im := image.NewNRGBA(image.Rect(0, 0, 256, 256))
+	im := image.NewRGBA(image.Rect(0, 0, 256, 256))
 	area := image.Rectangle{}
 	for y := 0; y < 2; y++ {
 		area.Min.Y = y * 128
@@ -183,7 +212,12 @@ func (ts *TileServer) get(pos image.Point, units int) (*image.NRGBA, bool, error
 			if !empty {
 				allEmpty = false
 			}
-			draw.BiLinear.Scale(im, area, littleIm, littleIm.Bounds(), draw.Src, nil)
+
+			if empty && ts.empty16x16 != nil {
+				draw.Draw(im, area, ts.empty16x16, area.Min, draw.Src)
+			} else {
+				draw.BiLinear.Scale(im, area, littleIm, littleIm.Bounds(), draw.Src, nil)
+			}
 		}
 	}
 

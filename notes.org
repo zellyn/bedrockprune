@@ -1,5 +1,13 @@
 * Bedrockprune working notes
 
+** Next
+
+- [X] Test bedrock zip function
+- [X] Write functions to get most recently modified bedrock and java
+      zips, without downloading
+- [ ] finish textures_test:TestZeroZeroBlocks
+- [ ] get TestZeroZeroBlocks working for all non-partial blocks
+- [ ] get TestZeroZeroBlocks working for all partial blocks
 
 ** [2024-02-25 Sun 21:18] - white lines at certain zooms
 
@@ -25,7 +33,7 @@ https://mcpedl.org/uploads_files/15-02-2024/minecraft-1-20-62.apk
 I cannot find geometry in here
 
 
-** How to map names to textures
+** How to map names to textures - bedrock
 
 Look in assets/assets/resource_packs/vanilla/blocks.json for the block name
 cat blocks.json | sed -e 's|//.*||' | jq .grass
@@ -121,6 +129,9 @@ normal 16x16
 - minecraft:oak_stairs upside_down_bit:0 weirdo_direction:2
 - minecraft:oak_stairs upside_down_bit:0 weirdo_direction:3
 
+> 0 is west 1 is east 2 is north and 3 is south.
+[[https://www.reddit.com/r/MinecraftCommands/comments/14luxj0/how_do_i_change_the_direction_of_stairs_using_fill/][reddit]]
+
 *** minecraft:snow_layer
 {
   "isotropic": true,
@@ -166,3 +177,31 @@ normal 16x16
   ]
 }
 ./textures/blocks/planks_oak.png
+
+** How to find resources - java
+
+oak_stairs:
+
+assets/minecraft/lang/en_us.json
+assets/minecraft/blockstates/oak_stairs.json
+assets/minecraft/blockstates/dark_oak_stairs.json
+assets/minecraft/models/item/oak_stairs.json
+assets/minecraft/models/item/dark_oak_stairs.json
+data/minecraft/worldgen/processor_list/zombie_plains.json
+data/minecraft/recipes/oak_stairs.json
+data/minecraft/tags/items/wooden_stairs.json
+data/minecraft/loot_tables/blocks/oak_stairs.json
+data/minecraft/loot_tables/blocks/dark_oak_stairs.json
+data/minecraft/recipes/dark_oak_stairs.json
+data/minecraft/tags/blocks/wooden_stairs.json
+data/minecraft/advancements/recipes/building_blocks/dark_oak_stairs.json
+data/minecraft/advancements/recipes/building_blocks/oak_stairs.json
+
+
+*** minecraft:grass
+*** minecraft:grass_path
+*** minecraft:lantern hanging:0
+*** minecraft:oak_stairs
+*** minecraft:snow_layer
+*** minecraft:standing_sign ground_sign_direction:4
+*** minecraft:wooden_slab top_slot_bit:0 wood_type:oak

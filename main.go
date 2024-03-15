@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"os"
 	"regexp"
@@ -334,6 +335,16 @@ func run4() error {
 	return nil
 }
 
+func printBlockNBTTypes(nbt map[string]any, indent int) {
+	for key, value := range nbt {
+		if val, ok := value.(map[string]any); ok {
+			printBlockNBTTypes(val, indent+4)
+		} else {
+			fmt.Printf("%s%s: %v (%T)\n", strings.Repeat(" ", indent), key, value, value)
+		}
+	}
+}
+
 func runShowZeroZero() error {
 	db, err := leveldb.OpenFile("./worlds/survivalone/db", nil)
 	if err != nil {
@@ -356,6 +367,8 @@ func runShowZeroZero() error {
 					return err
 				}
 				fmt.Printf("%d: %v\n", y, block)
+				printBlockNBTTypes(block, 0)
+
 				if true {
 					continue
 				}
@@ -448,18 +461,68 @@ func runScanEntireWorld() error {
 	return nil
 }
 
-func runLoadImage() error {
-	img, err := resources.GetBlockTexture("grass_top")
+func runFetch() error {
+	// clientURL, err := resources.GetLatestReleaseClientURL(context.Background())
+	// if err != nil {
+	// 	return err
+	// }
+	// fmt.Printf("Client URL: %s\n", clientURL)
+
+	zip, err := resources.LatestJavaReleaseClientZip(context.Background())
 	if err != nil {
 		return err
 	}
-	fmt.Printf("%v\n", img.Bounds())
+
+	file, err := zip.Open("assets/minecraft")
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("%T\n", file)
+
+	return nil
+}
+
+func runFetchBedrock() error {
+	// zip, err := resources.LatestBedrockReleaseClientZip(context.Background())
+	zip, err := resources.LatestCachedZip("bedrock-", "apk")
+	if err != nil {
+		return err
+	}
+
+	file, err := zip.Open("assets/assets")
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("%T\n", file)
+
+	return nil
+}
+
+func runGetGrass() error {
+	ts, err := resources.NewTextureSource(context.Background(), resources.UseOnlyCached)
+	if err != nil {
+		return err
+	}
+	img, err := ts.Get(map[string]any{
+		"name": "minecraft:grass",
+	})
+	if err != nil {
+		return err
+	}
+	_ = img
+	fmt.Printf("got grass image!\n")
 	return nil
 }
 
 func main() {
-	if err := runShowZeroZero(); err != nil {
-		// if err := runLoadImage(); err != nil {
+	// err := runGetGrass()
+	// err := runShowZeroZero()
+	// err := runFetchBedrock()
+	err := runShowZeroZero()
+	// if err := runLoadImage()
+	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		os.Exit(1)
 	}
