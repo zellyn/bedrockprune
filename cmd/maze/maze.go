@@ -91,6 +91,13 @@ func (m *maze) Get(x, y int) (*image.RGBA, error) {
 	return m.stone, nil
 }
 
+func (m *maze) Info(x, y int) (string, error) {
+	if m.cells[image.Point{X: x, Y: y}] == 0 {
+		return "grass", nil
+	}
+	return "stone", nil
+}
+
 func (m *maze) AllEmpty(area image.Rectangle) (bool, error) {
 	if area.Min.X > m.width || area.Min.Y > m.height || area.Max.X < 0 || area.Max.Y < 0 {
 		return true, nil

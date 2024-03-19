@@ -15,6 +15,7 @@ require (
 	gioui.org/cpu v0.0.0-20210817075930-8d6a761490d2 // indirect
 	gioui.org/shader v1.0.8 // indirect
 	github.com/anaskhan96/soup v1.2.5 // indirect
+	github.com/blezek/tga v0.0.0-20150626111426-80720cbc1017 // indirect
 	github.com/brentp/intintmap v0.0.0-20190211203843-30dc0ade9af9 // indirect
 	github.com/df-mc/atomic v1.10.0 // indirect
 	github.com/df-mc/worldupgrader v1.0.11 // indirect

@@ -1,9 +1,11 @@
 package tiles
 
 import (
+	"errors"
 	"fmt"
 	"image"
 
+	"github.com/zellyn/bedrockprune/types"
 	"golang.org/x/image/draw"
 )
 
@@ -11,6 +13,7 @@ import (
 type TileSource16 interface {
 	Get(x, y int) (*image.RGBA, error)
 	AllEmpty(image.Rectangle) (bool, error)
+	Info(x, y int) (string, error)
 }
 
 // TileServer is a source/cache of tile images generated from an
@@ -156,6 +159,9 @@ func (ts *TileServer) get(pos image.Point, units int) (*image.RGBA, bool, error)
 				area.Max.X = x*16 + 16
 				littleIm, err := ts.source.Get(x+pos.X, y+pos.Y)
 				if err != nil {
+					if errors.Is(err, types.ErrNotFound) {
+						continue
+					}
 					return nil, false, err
 				}
 				draw.Draw(im, area, littleIm, image.Point{}, draw.Src)

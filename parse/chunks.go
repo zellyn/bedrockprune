@@ -188,12 +188,12 @@ var levelChunkTagNames = map[byte]string{
 }
 
 type Chunk struct {
-	Dimension world.Dimension
-	ChunkPos  world.ChunkPos
-	SubChunks []subChunk
-	MaxLayer  int
-	KeyVals   []*KeyVal
-	HeightMap *HeightMap
+	Dimension  world.Dimension
+	ChunkPos   world.ChunkPos
+	SubChunks  []subChunk
+	MaxLayer   int
+	KeyVals    []*KeyVal
+	HeightMaps []*HeightMap
 }
 
 type subChunk struct {
@@ -289,7 +289,7 @@ func ParseSubChunk(kv *KeyVal) (subChunk, error) {
 	for layerIndex := 0; layerIndex < res.layerCount; layerIndex++ {
 		if layerIndex > 0 {
 			// fmt.Printf("skipping layer 2\n")
-			return res, nil
+			// return res, nil
 		}
 		var layer subChunkLayer
 		paletteType, err := buf.ReadByte()

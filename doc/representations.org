@@ -1,0 +1,64 @@
+* leveldb format
+
+https://minecraft.wiki/w/Bedrock_Edition_level_format
+https://wiki.vg/Bedrock_Edition_level_format
+https://learn.microsoft.com/en-us/minecraft/creator/documents/actorstorage?view=minecraft-bedrock-stable
+
+
+
+* Block types
+
+** grass
+
+Grass is complicated because it varies color by biome.
+The (grayscale) texture lives at ~assets/assets/resource_packs/vanilla/textures/blocks/grass_top.png~.
+
+#+ATTR_HTML: :width 200px
+[[./img/grass_top.png]]
+
+
+
+It uses a colormap located at ~assets/assets/resource_packs/vanilla/textures/colormap/grass.png~:
+
+#+CAPTION Grass color biome map
+[[./img/grass.png]]
+
+
+Explanation: https://minecraft.wiki/w/Color#Biome_colors
+
+
+* Questions
+
+** Why do some entries in textures/terrain_texture.json have multiple duplicate entries for the same texture?
+
+#+BEGIN_SRC shell
+  cat assets/resource_packs/vanilla/textures/terrain_texture.json | sed -e 's|//.*||' | jq .texture_data.grass_top
+  {
+    "textures": [
+      "textures/blocks/grass_top",
+      "textures/blocks/grass_top",
+      "textures/blocks/grass_top",
+      "textures/blocks/grass_top",
+      "textures/blocks/grass_top",
+      "textures/blocks/grass_top",
+      "textures/blocks/grass_top",
+      "textures/blocks/grass_top",
+      "textures/blocks/grass_top",
+      "textures/blocks/grass_top",
+      "textures/blocks/grass_top",
+      "textures/blocks/grass_top",
+      "textures/blocks/grass_top",
+      "textures/blocks/grass_top",
+      "textures/blocks/grass_top",
+      "textures/blocks/grass_top",
+      "textures/blocks/grass_top"
+    ]
+  }
+#+END_SRC
+
+#+STARTUP: inlineimages
+
+* Local Variables                                                  :noexport:
+Local Variables:
+org-image-actual-width: nil
+End:

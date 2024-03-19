@@ -351,7 +351,7 @@ func runShowZeroZero() error {
 		return err
 	}
 
-	chunk, err := parse.GetChunk(db, world.ChunkPos{}, world.Overworld)
+	chunk, err := parse.GetChunk(db, world.ChunkPos{15, 2}, world.Overworld)
 	if err != nil {
 		return err
 	}
@@ -362,12 +362,16 @@ func runShowZeroZero() error {
 		for z := 0; z < 16; z++ {
 			for x := 0; x < 16; x++ {
 				y := hm.Get(x, z)
+				if y == parse.NoHeight {
+					fmt.Printf("(%02d,%02d,--)\n", x, z)
+					continue
+				}
 				block, err := chunk.GetBlock(x, z, y, layer)
 				if err != nil {
 					return err
 				}
-				fmt.Printf("%d: %v\n", y, block)
-				printBlockNBTTypes(block, 0)
+				fmt.Printf("(%02d,%02d,%02d): %v\n", x, z, y, block)
+				// printBlockNBTTypes(block, 0)
 
 				if true {
 					continue

@@ -73,6 +73,9 @@ func (ch Chunk) GetBlock(x, z int, y int32, layer int) (map[string]any, error) {
 		if sc.yIndex != yIndex {
 			continue
 		}
+		if len(sc.layers) <= layer {
+			return nil, nil
+		}
 
 		subChunkLayer := sc.layers[layer]
 		if subChunkLayer.blockEntries == nil {
@@ -93,13 +96,20 @@ func (ch Chunk) MaxY() int32 {
 }
 
 func (ch Chunk) MinY() int32 {
+	if ch.Empty() {
+		return NoHeight
+	}
 	yIndex := ch.SubChunks[0].yIndex
 	return yIndex << 4
 }
 
-func (ch Chunk) GetHeightMap(layer int) *HeightMap {
-	if ch.HeightMap != nil {
-		return ch.HeightMap
+func (ch Chunk) Empty() bool {
+	return len(ch.SubChunks) == 0
+}
+
+func (ch *Chunk) GetHeightMap(layer int) *HeightMap {
+	if len(ch.HeightMaps) > layer && ch.HeightMaps[layer] != nil {
+		return ch.HeightMaps[layer]
 	}
 
 	var hm HeightMap
@@ -116,6 +126,10 @@ func (ch Chunk) GetHeightMap(layer int) *HeightMap {
 		}
 	}
 
-	ch.HeightMap = &hm
+	for len(ch.HeightMaps) <= layer {
+		ch.HeightMaps = append(ch.HeightMaps, nil)
+	}
+
+	ch.HeightMaps[layer] = &hm
 	return &hm
 }

@@ -16,7 +16,7 @@ func GetOccupiedChunkCoordinates(db *leveldb.DB) map[world.Dimension]map[world.C
 	for iter.Next() {
 		kv := NewKeyVal(iter.Key(), iter.Value())
 		keyInfo := kv.KeyTypeAndChunkLocation()
-		if keyInfo.HasLocation {
+		if keyInfo.HasLocation && keyInfo.KeyType.IsSubChunkPrefix() {
 			res[keyInfo.Dimension][keyInfo.ChunkPos] = true
 		}
 	}

@@ -1,4 +1,5 @@
 worlds
 .hermit
 bin/maze
+bin/view
 tmp

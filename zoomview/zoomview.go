@@ -387,8 +387,8 @@ func bringToFront() error {
 func empty16x16() *image.RGBA {
 	im := image.NewRGBA(image.Rect(0, 0, 256, 256))
 
-	lightGray := image.NewUniform(color.Gray{Y: 0xCC})
-	darkGray := image.NewUniform(color.Gray{Y: 0x66})
+	lightGray := image.NewUniform(color.Gray{Y: 0x00})
+	darkGray := image.NewUniform(color.Gray{Y: 0x33})
 
 	draw.Draw(im, im.Bounds(), lightGray, image.Point{}, draw.Src)
 	count := 8
